@@ -2,7 +2,7 @@
 
 namespace EasePHP\Handlers;
 
-abstract class RequestHandler {
+class RequestHandler {
     
     protected $controllers = array();
     
@@ -18,9 +18,9 @@ abstract class RequestHandler {
      */
     protected $controller;
     
-    public function __construct(array $request) {
+    public function __construct(array $controllers, array $request) {
+        $this->controllers = $controllers;
         $this->request = $request;
-        $this->controllers = $this->loadControllers();
         $this->init();
     }
     
@@ -30,9 +30,7 @@ abstract class RequestHandler {
         }
         $this->loadController($this->sanitize($this->request['resource']));
     }
-    
-    abstract protected function loadControllers();
-    
+        
     public function handleRequest() {
         return $this->controller->handleRequest();
     }
