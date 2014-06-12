@@ -15,5 +15,11 @@ require_once $system['paths']['root'].'/lib/vendor/bandu/requests/RESTfulRequest
 require_once $system['paths']['root'].'/lib/vendor/easephp/handlers/RequestHandler.php';
 require_once $system['paths']['root'].'/lib/vendor/easephp/controllers/restful/Controller.php';
 
-$requestHandler = new EasePHP\Handlers\RequestHandler($app['controllers'], array('resource' => 'sample'));
+require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['controllers'].'/fusion/CampaignController.php';
+require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['classes'].'/resources/fusion/Campaign.php';
+require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['classes'].'/resources/managers/local/fusion/CampaignsManager.php';
+
+$_SERVER['REQUEST_METHOD'] = 'GET';
+
+$requestHandler = new EasePHP\Handlers\RequestHandler($app['controllers'], array('resource' => 'campaign'));
 echo $requestHandler->handleRequest();
