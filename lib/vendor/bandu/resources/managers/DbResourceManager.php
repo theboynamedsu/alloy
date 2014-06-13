@@ -4,7 +4,7 @@ namespace Bandu\Orm;
 
 use Bandu\Database\MySQLWrapper;
 
-abstract class LocalResourceManager {
+abstract class DbResourceManager {
 
     /**
      * @var \bandu\database\MySQLWrapper
