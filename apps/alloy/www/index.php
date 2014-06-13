@@ -10,7 +10,7 @@ require_once $system['paths']['root'].'/lib/vendor/bandu/orm/ORMComponent.php';
 require_once $system['paths']['root'].'/lib/vendor/bandu/orm/Property.php';
 require_once $system['paths']['root'].'/lib/vendor/bandu/orm/Association.php';
 require_once $system['paths']['root'].'/lib/vendor/bandu/orm/Collection.php';
-require_once $system['paths']['root'].'/lib/vendor/bandu/resources/managers/LocalResourceManager.php';
+require_once $system['paths']['root'].'/lib/vendor/bandu/resources/managers/DbResourceManager.php';
 require_once $system['paths']['root'].'/lib/vendor/bandu/requests/RESTfulRequest.php';
 require_once $system['paths']['root'].'/lib/vendor/easephp/handlers/RequestHandler.php';
 require_once $system['paths']['root'].'/lib/vendor/easephp/controllers/restful/Controller.php';

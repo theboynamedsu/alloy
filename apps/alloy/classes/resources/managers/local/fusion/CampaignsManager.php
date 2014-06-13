@@ -13,7 +13,7 @@ namespace Resources\Managers\Local\Fusion;
  *
  * @author Bandu
  */
-class CampaignsManager extends \Bandu\Orm\LocalResourceManager {
+class CampaignsManager extends \Bandu\Resources\Managers\DbResourceManager {
 
     protected function getAssociations() {
         return array(

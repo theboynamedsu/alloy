@@ -1,10 +1,10 @@
 <?php
 
-namespace Bandu\Orm;
+namespace Bandu\Resources\Managers;
 
 use Bandu\Database\MySQLWrapper;
 
-abstract class LocalResourceManager {
+abstract class DbResourceManager {
 
     /**
      * @var \bandu\database\MySQLWrapper
