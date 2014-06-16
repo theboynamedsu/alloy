@@ -31,6 +31,17 @@ class MySQLWrapper {
     const UPDATE = 5;
     const DELETE = 6;
     
+    protected static $OPERATORS = array(
+        '_eq' => 'handleEqualToOperator',
+        '_ne' => 'handleNotEqualToOperator',
+        '_gt' =>  'handleGreaterThanOperator',
+        '_gte' => 'handleGreaterThanOrEqualToOperator',
+        '_lt' => 'handleLessThanOperator',
+        '_lte' => 'handleLessThanOrEqualToOperator',
+        '_in' => 'handleInOperator',
+        '_nin' => 'handleNotInOperator'
+    );
+
     /**
      * Generic insert query for single and multiple inserts.
      * 
@@ -298,14 +309,100 @@ class MySQLWrapper {
     }
     
     protected function buildWhereClause(array $whereArray = null) {
-        if (isset($whereArray)) {
-            $whereClauses = array();
-            foreach ($whereArray as $field => $value) {
+        $whereClauses = array();
+        foreach ($whereArray as $field => $value) {
+            if (!is_array($value)) {
                 $whereClauses[] = $field . " = '".mysql_real_escape_string($value, $this->dbConn)."'";
+            } else {
+                $whereClauses[] = $this->getFilter($field, $value);
             }
-            return " WHERE " . implode(" AND ", $whereClauses);
         }
-        return "";
+        return " WHERE " . implode(" AND ", $whereClauses);
+    }
+    
+    protected function getFilter($field, $filter) {
+        foreach ($filter as $operator => $value) {
+            if (!array_key_exists($operator, self::$OPERATORS)) {
+                throw new \Exception('Unknown Operator: '.$operator);
+            }
+            $filters = array();
+            $filterHandler = self::$OPERATORS[$operator];
+            $filters[] = $this->$filterHandler($field, $value);
+        }
+        $combinedFilter = implode(" AND ", $filters);
+        return $combinedFilter;
+    }
+    
+    protected function handleEqualToOperator($field, $value) {
+        $placeHolders = array(
+            $field,
+            mysql_real_escape_string($value, $this->dbConn),
+        );
+        return vsprintf("%s = '%s'", $placeHolders);
+    }
+
+    protected function handleNotEqualToOperator($field, $value) {
+        $placeHolders = array(
+            $field,
+            mysql_real_escape_string($value, $this->dbConn),
+        );
+        return vsprintf("%s != '%s'", $placeHolders);
+    }
+
+    protected function handleInOperator($field, array $values) {
+        $escapedValues = array();
+        foreach ($values as $value) {
+            $escapedValues[] = '"'.mysql_real_escape_string($value, $this->dbConn).'"';
+        }
+        $placeholders = array(
+            $field,
+            implode(', ', $escapedValues),
+        );
+        return vsprintf("%s IN (%s)", $placeholders);
+    }
+    
+    protected function handleNotInOperator($field, array $values) {
+        $escapedValues = array();
+        foreach ($values as $value) {
+            $escapedValues[] = '"'.mysql_real_escape_string($value, $this->dbConn).'"';
+        }
+        $placeholders = array(
+            $field,
+            implode(', ', $escapedValues),
+        );
+        return vsprintf("%s NOT IN (%s)", $placeholders);
+    }
+    
+    protected function handleGreaterThanOperator($field, $value) {
+        $placeHolders = array(
+            $field,
+            mysql_real_escape_string($value, $this->dbConn),
+        );
+        return vsprintf("%s > '%s'", $placeHolders);
+    }
+    
+    protected function handleGreaterThanOrEqualToOperator($field, $value) {
+        $placeHolders = array(
+            $field,
+            mysql_real_escape_string($value, $this->dbConn),
+        );
+        return vsprintf("%s >= '%s'", $placeHolders);
+    }
+    
+    protected function handleLessThanOperator($field, $value) {
+        $placeHolders = array(
+            $field,
+            mysql_real_escape_string($value, $this->dbConn),
+        );
+        return vsprintf("%s < '%s'", $placeHolders);
+    }
+    
+    protected function handleLessThanOrEqualToOperator($field, $value) {
+        $placeHolders = array(
+            $field,
+            mysql_real_escape_string($value, $this->dbConn),
+        );
+        return vsprintf("%s <= '%s'", $placeHolders);
     }
     
     protected function buildSetClauses(array $updateValues) {
@@ -415,3 +512,4 @@ class MySQLWrapper {
     }
     
 }
+
