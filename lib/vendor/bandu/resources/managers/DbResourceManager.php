@@ -5,9 +5,19 @@ namespace Bandu\Orm;
 use Bandu\Database\MySQLWrapper;
 
 abstract class DbResourceManager {
+    
+    protected static $OPERATORS = array(
+        '_gt' =>  '> %s',
+        '_gte' => '>= %s',
+        '_lt' => '< %s',
+        '_lte' => '<= %s',
+        '_ne' => '!= %s',
+        '_in' => 'IN (%s)',
+        '_nin' => 'NOT IN (%s)',
+    );
 
     /**
-     * @var \bandu\database\MySQLWrapper
+     * @var \Bandu\Database\MySQLWrapper
      */
     protected $db;
 
@@ -49,8 +59,8 @@ abstract class DbResourceManager {
     }
 
     public function create(&$resource) {
-        $resource = $this->createResourceProperties($resource);
-        $resource = $this->createResourceAssociations($resource);
+        $this->createResourceProperties($resource);
+        $this->createResourceAssociations($resource);
         return true;
     }
 
@@ -60,7 +70,7 @@ abstract class DbResourceManager {
         return true;
     }
 
-    protected function retrieveResourceProperties($resource) {
+    protected function retrieveResourceProperties(&$resource) {
         $properties = array();
         foreach ($this->getProperties() as $prop => $data) {
             $getter = 'get'.ucfirst($prop);
@@ -78,7 +88,7 @@ abstract class DbResourceManager {
         }
     }
 
-    protected function retrieveResourceAssociations($resource) {
+    protected function retrieveResourceAssociations(&$resource) {
         if (count($this->associations)) {
             $properties = $this->getResourceProperties($resource);
             $retrieveAssociationsQueries = $this->populateQueries('retrieve', 'associations', $properties);
@@ -123,7 +133,7 @@ abstract class DbResourceManager {
         return $populatedQueries;
     }
 
-    protected function createResourceProperties($resource) {
+    protected function createResourceProperties(&$resource) {
         $properties = $this->getResourceProperties($resource);
         $createQueries = $this->populateQueries('create', 'properties', $properties);
         try {
@@ -135,7 +145,7 @@ abstract class DbResourceManager {
         return $resource;
     }
 
-    protected function createResourceAssociations($resource) {
+    protected function createResourceAssociations(&$resource) {
         if (!count($this->associations)) {
             return $resource;
         }
@@ -394,5 +404,26 @@ abstract class DbResourceManager {
         }
         return $resourceAssociations;
     }
-
+    
+    public function find(array $criteria) {
+        $this->searchProperties($criteria);
+    }
+    
+    protected function searchProperties(array $criteria) {
+        $results = array();
+        $params = array();
+        foreach (array_keys($this->getProperties()) as $prop) {
+            if (!array_key_exists($prop, $criteria)) {
+                continue;
+            }
+            $params[$prop] = $criteria[$prop];
+        }
+        $fields = implode(', ', $this->defaults['filter']);
+        if ($this->db->select($this->defaults['table'], $fields, $params)) {
+            foreach ($this->db->fetchAll() as $match) {
+                $results[] = $this->retrieve(new $this->resourceClass($match));
+            }
+        }
+    }
+    
 }
