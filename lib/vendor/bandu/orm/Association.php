@@ -17,6 +17,7 @@ class Association extends ORMComponent {
     protected $table;
     protected $fields;
     protected $filter;
+    protected $searchOptions;
     protected $callback;
 
     protected $query;
@@ -25,6 +26,7 @@ class Association extends ORMComponent {
     protected function init() {
         $this->fields = array();
         $this->filter = array();
+        $this->searchOptions = array();
         $this->callback = array();
         $this->args = array();
     }
@@ -34,6 +36,7 @@ class Association extends ORMComponent {
             'table',
             'fields',
             'filter',
+            'searchOptions',
             'callback',
         );
     }
@@ -57,6 +60,10 @@ class Association extends ORMComponent {
             throw new \Exception('Filters must be strings');
         }
         $this->filter = $filter;
+    }
+
+    protected function setSearchOptions(array $searchOptions = array()) {
+        $this->searchOptions = $searchOptions;
     }
 
     protected function setCallback(array $callback) {

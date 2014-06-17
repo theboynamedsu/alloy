@@ -13,8 +13,8 @@ namespace Resources\Managers\Local\Fusion;
  *
  * @author Bandu
  */
-class CampaignsManager extends \Bandu\Orm\LocalResourceManager {
-
+class CampaignsManager extends \Bandu\Orm\DbResourceManager {
+    
     protected function getAssociations() {
         return array(
             'distributionChannels' => array(
@@ -27,6 +27,7 @@ class CampaignsManager extends \Bandu\Orm\LocalResourceManager {
                 'filter' => array(
                     'id' => 'campaignId',
                 ),
+                'searchOptions' => array(),
                 'callback' => array(),
             ),
             'settings' => array(
@@ -37,6 +38,16 @@ class CampaignsManager extends \Bandu\Orm\LocalResourceManager {
                 ),
                 'filter' => array(
                     'id' => 'campaignId',
+                ),
+                'searchOptions' => array(
+                    'hasEndDate' => array(
+                        'key' => 'dataKey',
+                        'value' => 'dataValue',                            
+                    ),
+                    'startDate' => array(
+                        'key' => 'dataKey',
+                        'value' => 'dataValue',
+                    ),
                 ),
                 'callback' => array(),
             ),
@@ -49,6 +60,7 @@ class CampaignsManager extends \Bandu\Orm\LocalResourceManager {
 
     protected function getDefaults() {
         return array(
+            'resource' => '\Resources\Fusion\Campaign',
             'table' => 'Campaigns',
             'filter' => array(
                 'id',

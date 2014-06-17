@@ -138,7 +138,7 @@ class MySQLWrapper {
     }
     
     public function execute($sql) {
-        $sql = trim($sql);
+        echo $sql = trim($sql);
         $this->queryLog[] = $sql;
 
         if ($this->result = mysql_query($sql, $this->dbConn)) {
