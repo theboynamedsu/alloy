@@ -90,7 +90,10 @@ abstract class DbResourceManager {
     }
 
     public function find(array $criteria) {
-        return $this->searchAssociations($criteria);
+        return array_merge(
+            $this->searchProperties($criteria),
+            $this->searchAssociations($criteria)
+        );
     }
 
     protected function retrieveResourceProperties(&$resource) {
@@ -478,7 +481,6 @@ abstract class DbResourceManager {
         $results = array();
         if ($this->db->getNumRows()) {
             foreach ($this->db->fetchAll() as $match) {
-                $resourceClass = $this->getResourceClass();
                 $r = new $this->defaults['resource']($match);
                 $this->retrieve($r);
                 $results[] = $r;
