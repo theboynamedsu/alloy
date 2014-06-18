@@ -7,28 +7,25 @@ use Bandu\Database\MySQLWrapper;
 abstract class DbResourceManager {
 
     protected static $OPERATORS = array(
-            '_gt' =>  '> %s',
-            '_gte' => '>= %s',
-            '_lt' => '< %s',
-            '_lte' => '<= %s',
-            '_ne' => '!= %s',
-            '_in' => 'IN (%s)',
-            '_nin' => 'NOT IN (%s)',
+        '_gt' => '> %s',
+        '_gte' => '>= %s',
+        '_lt' => '< %s',
+        '_lte' => '<= %s',
+        '_ne' => '!= %s',
+        '_in' => 'IN (%s)',
+        '_nin' => 'NOT IN (%s)',
     );
-    
     protected $resourceClass;
 
     /**
      * @var \Bandu\Database\MySQLWrapper
      */
     protected $db;
-
     protected $queries;
     protected $defaults;
     protected $properties;
     protected $associations;
     protected $collections;
-
     protected $metaData;
 
     public function __construct(MySQLWrapper $db) {
@@ -46,17 +43,17 @@ abstract class DbResourceManager {
         $this->associations = array();
         $this->collections = array();
         $this->metaData = array(
-                'properties' => array(),
-                'associations' => array(),
-                'collections' => array(),
+            'properties' => array(),
+            'associations' => array(),
+            'collections' => array(),
         );
     }
 
     public function loadConfig() {
         $this->loadDefaults()
-        ->loadProperties()
-        ->loadAssociations()
-        ->loadCollections();
+                ->loadProperties()
+                ->loadAssociations()
+                ->loadCollections();
         return $this;
     }
 
@@ -84,7 +81,7 @@ abstract class DbResourceManager {
         foreach ($deleteAssociationsQueries as $q) {
             $this->db->execute($q);
         }
-        $deletePropertiesQueries= $this->populateQueries('delete', 'properties', $properties);
+        $deletePropertiesQueries = $this->populateQueries('delete', 'properties', $properties);
         foreach ($deletePropertiesQueries as $q) {
             $this->db->execute($q);
         }
@@ -99,7 +96,7 @@ abstract class DbResourceManager {
     protected function retrieveResourceProperties(&$resource) {
         $properties = array();
         foreach ($this->getProperties() as $prop => $data) {
-            $getter = 'get'.ucfirst($prop);
+            $getter = 'get' . ucfirst($prop);
             $value = $resource->$getter();
             if (!is_null($value)) {
                 $properties[] = sprintf("%s = '%s'", $data['field'], $value);
@@ -121,7 +118,7 @@ abstract class DbResourceManager {
             foreach ($retrieveAssociationsQueries as $property => $q) {
                 if ($this->db->execute($q)) {
                     $associations = $this->db->fetchAll();
-                    $setter = "set".ucfirst($property);
+                    $setter = "set" . ucfirst($property);
                     $resource->$setter($associations);
                 }
             }
@@ -168,12 +165,12 @@ abstract class DbResourceManager {
                     foreach ($assoc as $value) {
                         $args[] = "'$value'";
                     }
-                    $arguments[] = "(".implode(", ", $args).")";
+                    $arguments[] = "(" . implode(", ", $args) . ")";
                 }
             }
             $createQueries[] = str_replace(":values", implode(", ", $arguments), $q);
         }
-        foreach($createQueries as $q) {
+        foreach ($createQueries as $q) {
             $this->db->execute($q);
         }
         return $resource;
@@ -182,7 +179,7 @@ abstract class DbResourceManager {
     protected function updateResourceProperties($resource) {
         $properties = $this->getResourceProperties($resource);
         $updateQueries = $this->populateQueries('update', 'properties', $properties);
-        foreach($updateQueries as $q) {
+        foreach ($updateQueries as $q) {
             $this->db->execute($q);
         }
         return $resource;
@@ -191,7 +188,7 @@ abstract class DbResourceManager {
     protected function updateResourceAssociations($resource) {
         $properties = $this->getResourceProperties($resource);
         $deleteQueries = $this->populateQueries("delete", "associations", $properties);
-        foreach($deleteQueries as $q) {
+        foreach ($deleteQueries as $q) {
             $this->db->execute($q);
         }
         $this->createResourceAssociations($resource);
@@ -256,17 +253,17 @@ abstract class DbResourceManager {
                 return $this->defaults['table'];
             }
         }
-        throw new \Exception("No Table Defined For Property: ".$p->name);
+        throw new \Exception("No Table Defined For Property: " . $p->name);
     }
 
     protected function loadAssociationsMetaData() {
         $associationsData = array();
         foreach ($this->associations as $a) {
             $associationsData[$a->name] = array(
-                    'table' => $a->table,
-                    'fields' => $a->fields,
-                    'filter' => $a->filter,
-                    'callback' => $a->callback,
+                'table' => $a->table,
+                'fields' => $a->fields,
+                'filter' => $a->filter,
+                'callback' => $a->callback,
             );
         }
         $this->metaData['associations'] = $associationsData;
@@ -275,16 +272,15 @@ abstract class DbResourceManager {
 
     protected function generateQueries() {
         $this->generateCreateQueries()
-        ->generateRetrieveQueries()
-        ->generateUpdateQueries()
-        ->generateDeleteQueries();
+                ->generateRetrieveQueries()
+                ->generateUpdateQueries()
+                ->generateDeleteQueries();
     }
 
     protected function generateCreateQueries() {
-        $callback =
-        function (&$item) {
-            $item = ":$item";
-        };
+        $callback = function (&$item) {
+                    $item = ":$item";
+                };
 
         foreach ($this->metaData['properties'] as $table => $input) {
             $fields = implode(', ', array_values($input));
@@ -293,17 +289,17 @@ abstract class DbResourceManager {
             array_walk($values, $callback);
 
             $args = array(
-                    $table,
-                    $fields,
-                    implode(', ', $values),
+                $table,
+                $fields,
+                implode(', ', $values),
             );
             $this->queries['create']['properties'][] = vsprintf("INSERT INTO %s (%s) VALUES (%s)", $args);
         }
         foreach ($this->metaData['associations'] as $property => $input) {
             $assocArgs = array(
-                    $input['table'],
-                    implode(', ', array_merge(array_values($input['filter']), $input['fields'])),
-                    $this->getAssociationFilter($property),
+                $input['table'],
+                implode(', ', array_merge(array_values($input['filter']), $input['fields'])),
+                $this->getAssociationFilter($property),
             );
             $this->queries['create']['associations'][] = vsprintf("INSERT INTO %s(%s) VALUES :values", $assocArgs);
         }
@@ -317,16 +313,16 @@ abstract class DbResourceManager {
                 $fields[] = "$field AS $property";
             }
             $args = array(
-                    implode(', ', $fields),
-                    $table,
+                implode(', ', $fields),
+                $table,
             );
             $this->queries['retrieve']['properties'][] = vsprintf("SELECT %s FROM %s WHERE :where", $args);
         }
         foreach ($this->metaData['associations'] as $property => $input) {
             $assocArgs = array(
-                    implode(', ', $input['fields']),
-                    $input['table'],
-                    $this->getAssociationFilter($property),
+                implode(', ', $input['fields']),
+                $input['table'],
+                $this->getAssociationFilter($property),
             );
             $this->queries['retrieve']['associations'][$property] = vsprintf("SELECT %s FROM %s WHERE %s", $assocArgs);
         }
@@ -340,9 +336,9 @@ abstract class DbResourceManager {
                 $fieldValues[] = "$field = :$property";
             }
             $args = array(
-                    $table,
-                    implode(', ', $fieldValues),
-                    $this->getResourceFilter(),
+                $table,
+                implode(', ', $fieldValues),
+                $this->getResourceFilter(),
             );
             $this->queries['update']['properties'][] = vsprintf("UPDATE %s SET %s WHERE %s", $args);
         }
@@ -352,15 +348,15 @@ abstract class DbResourceManager {
     protected function generateDeleteQueries() {
         foreach ($this->metaData['associations'] as $property => $input) {
             $assocArgs = array(
-                    $input['table'],
-                    $this->getAssociationFilter($property),
+                $input['table'],
+                $this->getAssociationFilter($property),
             );
             $this->queries['delete']['associations'][] = vsprintf("DELETE FROM %s WHERE %s", $assocArgs);
         }
         foreach ($this->metaData['properties'] as $table => $input) {
             $args = array(
-                    $table,
-                    $this->getResourceFilter(),
+                $table,
+                $this->getResourceFilter(),
             );
             $this->queries['delete']['properties'][] = vsprintf("DELETE FROM %s WHERE %s", $args);
         }
@@ -387,7 +383,7 @@ abstract class DbResourceManager {
     protected function getResourceProperties($resource) {
         $resourceProperties = array();
         foreach (array_keys($this->getProperties()) as $property) {
-            $getProperty = "get".ucfirst($property);
+            $getProperty = "get" . ucfirst($property);
             $resourceProperties[":$property"] = $resource->$getProperty();
         }
         return $resourceProperties;
@@ -398,10 +394,10 @@ abstract class DbResourceManager {
         foreach ($this->getAssociations() as $property => $properties) {
             $assoc = array();
             foreach ($properties['filter'] as $prop => $field) {
-                $getProperty = "get".ucfirst($prop);
+                $getProperty = "get" . ucfirst($prop);
                 $assoc[$field] = $resource->$getProperty();
             }
-            $getter = "get".ucfirst($property);
+            $getter = "get" . ucfirst($property);
             if (is_array($resource->getter())) {
                 foreach ($resource->$getter() as $association) {
                     $resourceAssociations[$property][] = array_merge($assoc, $association);
@@ -429,28 +425,39 @@ abstract class DbResourceManager {
         foreach ($params as $param => $indexes) {
             $table = $associations[$param]['table'];
             $fields = implode(', ', $associations[$param]['filter']);
-            foreach ($indexes as $index => $operators) {
-                $keyField = $associations[$param]['searchOptions'][$index]['key'];
-                $valueField = $associations[$param]['searchOptions'][$index]['value'];
-                
-                $where = array();
-                foreach ($operators as $comparison => $operator) {
-                    $where[$keyField] = $index;
-                    $where[$valueField] = array( $comparison => $operator);
-                }
-                $this->db->select($table, $fields, $where);
-                if ($this->db->getNumRows()) {
-                    foreach ($this->db->fetchAll() as $associated) {
-                        $resourceCriteria = array();
-                        foreach ($associations[$param]['filter'] as $field => $ref) {
-                            $resourceCriteria[$field] = $associated[$ref];
-                            $resource = new $this->defaults['resource']($resourceCriteria);
-                            $this->retrieve($resource);
-                            $results[] = $resource; 
-                        }
-                    }
-                }
+            $where = $this->buildAssociatedWhereClause($param, $indexes);
+            $this->db->select($table, $fields, $where);
+            $results = $this->fetchAssociatedResources($associations[$param]['filter']);
+        }
+        return $results;
+    }
+
+    protected function buildAssociatedWhereClause($param, $indexes) {
+        $associationSearchOptions = $this->associations[$param]['searchOptions'];
+        $where = array();
+        foreach ($indexes as $index => $operators) {
+            $keyField = $associationSearchOptions[$index]['key'];
+            $valueField = $associationSearchOptions[$index]['value'];
+            foreach ($operators as $comparison => $operator) {
+                $where[$keyField] = $index;
+                $where[$valueField] = array($comparison => $operator);
             }
+        }
+    }
+
+    protected function fetchAssociatedResources($referenceMapping) {
+        if (!$this->db->getNumRows()) {
+            return array();
+        }
+        $results = array();
+        foreach ($this->db->fetchAll() as $associated) {
+            $resourceCriteria = array();
+            foreach ($referenceMapping as $field => $ref) {
+                $resourceCriteria[$field] = $associated[$ref];
+            }
+            $resource = new $this->defaults['resource']($resourceCriteria);
+            $this->retrieve($resource);
+            $results[] = $resource;
         }
         return $results;
     }
