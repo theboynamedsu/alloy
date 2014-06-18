@@ -481,7 +481,6 @@ abstract class DbResourceManager {
         $results = array();
         if ($this->db->getNumRows()) {
             foreach ($this->db->fetchAll() as $match) {
-                $resourceClass = $this->getResourceClass();
                 $r = new $this->defaults['resource']($match);
                 $this->retrieve($r);
                 $results[] = $r;
