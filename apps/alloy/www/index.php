@@ -1,7 +1,11 @@
 <?php
 
-$system = parse_ini_file("../../../config/system-dev.ini", true);
-$app = parse_ini_file("../config/sample-dev.ini", true);
+if (!isset($_SERVER) || !array_key_exists('env', $_SERVER)) {
+    $_SERVER['env'] = 'live';
+}
+
+$system = parse_ini_file(sprintf("../../../config/system-%s.ini", $_SERVER['env']), true);
+$app = parse_ini_file(sprintf("../config/sample-%s.ini", $_SERVER['env']), true);
 
 require_once $system['paths']['root'].'/lib/vendor/bandu/database/MySQLWrapper.php';
 require_once $system['paths']['root'].'/lib/vendor/bandu/objects/Struct.php';
@@ -16,10 +20,10 @@ require_once $system['paths']['root'].'/lib/vendor/easephp/handlers/RequestHandl
 require_once $system['paths']['root'].'/lib/vendor/easephp/controllers/restful/Controller.php';
 
 require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['controllers'].'/fusion/CampaignController.php';
+require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['controllers'].'/fusion/CampaignsController.php';
 require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['classes'].'/resources/fusion/Campaign.php';
 require_once $system['paths']['apps'].DIRECTORY_SEPARATOR.$app['paths']['classes'].'/resources/managers/local/fusion/CampaignsManager.php';
 
-$_SERVER['REQUEST_METHOD'] = 'GET';
-
-$requestHandler = new EasePHP\Handlers\RequestHandler($app['controllers'], array('resource' => 'campaign'));
+$requestHandler = new EasePHP\Handlers\RequestHandler($app['controllers'], $_GET);
+header('Content-Type: application/json');
 echo $requestHandler->handleRequest();
