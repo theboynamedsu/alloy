@@ -8,8 +8,8 @@ class CampaignController extends \EasePHP\Controllers\RESTful\Controller {
         $db = new \Bandu\Database\MySQLWrapper(array(
                 'server' => 'localhost',
                 'user' => 'root',
-                'password' => 'p4$$word!',
-                'db' => 'fusion'
+                'password' => '911DKPrince!',
+                'db' => 'test'
         ));
         return new \Resources\Managers\Local\Fusion\CampaignsManager($db);
     }
@@ -18,12 +18,6 @@ class CampaignController extends \EasePHP\Controllers\RESTful\Controller {
         $campaign = new \Resources\Fusion\Campaign(array(
             'id' => 1,
         ));
-        $settings = array(
-            'startDate' => array(
-                '_lt' => time(),
-            ),
-        );
-        print_r($this->getResourceManager()->find(array('settings' => $settings)));
         $this->getResourceManager()->retrieve($campaign);
         return $campaign->render('JSON');
     }

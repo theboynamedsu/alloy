@@ -433,7 +433,7 @@ abstract class DbResourceManager {
     }
 
     protected function buildAssociatedWhereClause($param, $indexes) {
-        $associationSearchOptions = $this->associations[$param]['searchOptions'];
+        $associationSearchOptions = $this->associations[$param]->searchOptions;
         $where = array();
         foreach ($indexes as $index => $operators) {
             $keyField = $associationSearchOptions[$index]['key'];
@@ -443,6 +443,7 @@ abstract class DbResourceManager {
                 $where[$valueField] = array($comparison => $operator);
             }
         }
+        return $where;
     }
 
     protected function fetchAssociatedResources($referenceMapping) {
