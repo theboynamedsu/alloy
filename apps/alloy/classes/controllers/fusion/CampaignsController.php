@@ -34,8 +34,7 @@ class CampaignsController extends \EasePHP\Controllers\RESTful\Controller {
     }
 
     public function handleGet() {
-        $searchCriteria = $this->getRequestData();
-        $results = $this->getResourceManager()->find($searchCriteria);
+        $results = $this->getResourceManager()->find($this->request);
         if (!count($results)) {
             return \json_encode(array());
         }
