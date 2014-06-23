@@ -95,6 +95,13 @@ abstract class DbResourceManager {
             $this->searchAssociations($criteria)
         );
     }
+    
+    public function fetchAll() {
+        $table = $this->defaults['table'];
+        $fields = implode(", ", $this->defaults['filter']);
+        $this->db->select($table, $fields);
+        return $this->fetchResources();
+    }
 
     protected function retrieveResourceProperties(&$resource) {
         $properties = array();

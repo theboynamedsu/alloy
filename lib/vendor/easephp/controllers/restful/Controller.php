@@ -10,6 +10,7 @@ abstract class Controller {
     const POST = 'POST';
     const PUT = 'PUT';
     const DELETE = 'DELETE';
+    const OPTIONS = "OPTIONS";
     
     /**
      * 
@@ -25,19 +26,17 @@ abstract class Controller {
         switch(strtoupper($_SERVER['REQUEST_METHOD'])) {
             case self::GET:
                 return $this->handleGet();
-                break;
             case self::POST:
                 return $this->handlePost();
-                break;
             case self::PUT:
                 return $this->handlePut();
-                break;
             case self::DELETE:
                 return $this->handleDelete();
-                break;
+            case self::OPTIONS:
+                $method = $this->determineRequestMethod();
+                return "Inbound Request: $method";
             default:
                 throw new Exception('Bad Request: Unknown Request Method');
-                break;
         }
     }
     
@@ -50,6 +49,14 @@ abstract class Controller {
     abstract public function handleDelete();
     
     abstract protected function getResourceManager();
+    
+    protected function determineRequestMethod() {
+        if (array_key_exists("HTTP_ACCESS_CONTROL_REQUEST_METHOD", $_SERVER)) {
+            return strtoupper($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']);
+        } else {
+            throw new \Exception('Bad Request: Unknown Request Method');
+        }
+    }
     
     protected function getRequestData() {
         $payload = file_get_contents('php://input');

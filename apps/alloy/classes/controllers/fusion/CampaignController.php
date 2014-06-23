@@ -22,17 +22,13 @@ class CampaignController extends \EasePHP\Controllers\RESTful\Controller {
         if (!array_key_exists('id', $this->request)) {
             throw new \Exception("Please provide an ID for the requested resource");
         }
-        $campaign = new \Resources\Fusion\Campaign(array(
+        $campaign = $this->getResourceBy(array(
             'id' => $this->request['id'],
         ));
-        $this->getResourceManager()->retrieve($campaign);
         return $campaign->render('JSON');
     }
     
     public function handlePost() {
-        if (!array_key_exists('id', $this->request)) {
-            throw new \Exception("Please provide an ID for the requested resource");
-        }
         $properties = $this->getRequestData();
         $campaign = new \Resources\Fusion\Campaign($properties);
         $this->getResourceManager()->create($campaign);
@@ -40,11 +36,40 @@ class CampaignController extends \EasePHP\Controllers\RESTful\Controller {
     }
     
     public function handlePut() {
-        
+        if (!array_key_exists('id', $this->request)) {
+            throw new \Exception("Please provide an ID for the requested resource");
+        }
+        $campaign = $this->getResourceBy(array(
+            'id' => $this->request['id'],
+        ));
+        $campaign->setProperties($this->getRequestData());
+        $this->getResourceManager()->update($campaign);
+        return $campaign->render('JSON');        
     }
     
     public function handleDelete() {
-        
+        if (!array_key_exists('id', $this->request)) {
+            throw new \Exception("Please provide an ID for the requested resource");
+        }
+        $campaign = $this->getResourceBy(array(
+            'id' => $this->request['id'],
+        ));
+        $this->getResourceManager()->delete($campaign);
+        return "";
+    }
+    
+    /**
+     * 
+     * @param array $criteria
+     * @return \Resources\Fusion\Campaign
+     * @throws Exception
+     */
+    protected function getResourceBy(array $criteria) {
+        $results = $this->getResourceManager()->find($criteria);
+        if (count($results != 1)) {
+            throw new \Exception("Resource not found", 404);
+        }
+        return $results[0];
     }
     
 }

@@ -30,11 +30,15 @@ class CampaignsController extends \EasePHP\Controllers\RESTful\Controller {
     }
 
     public function handleDelete() {
-        throw new Exception("Method not supported for this resource");
+        throw new \Exception("Method not supported for this resource");
     }
 
     public function handleGet() {
-        $results = $this->getResourceManager()->find($this->request);
+        if (array_key_exists("q", $this->request)) {
+            $results = $this->getResourceManager()->find($this->request['q']);
+        } else {
+            $results = $this->getResourceManager()->fetchAll();
+        }
         if (!count($results)) {
             return \json_encode(array());
         }
@@ -46,10 +50,10 @@ class CampaignsController extends \EasePHP\Controllers\RESTful\Controller {
     }
 
     public function handlePost() {
-        throw new Exception("Method not supported for this resource");
+        throw new \Exception("Method not supported for this resource");
     }
 
     public function handlePut() {
-        throw new Exception("Method not supported for this resource");
+        throw new \Exception("Method not supported for this resource");
     }
 }

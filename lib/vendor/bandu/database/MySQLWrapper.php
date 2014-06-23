@@ -317,7 +317,11 @@ class MySQLWrapper {
                 $whereClauses[] = $this->getFilter($field, $value);
             }
         }
-        return " WHERE " . implode(" AND ", $whereClauses);
+        if (count($whereClauses) == 0) {
+            return "";
+        } else {
+            return " WHERE " . implode(" AND ", $whereClauses);
+        }
     }
     
     protected function getFilter($field, $filter) {

@@ -63,7 +63,7 @@ class CampaignsManager extends \Bandu\Orm\DbResourceManager {
             'resource' => '\Resources\Fusion\Campaign',
             'table' => 'Campaigns',
             'filter' => array(
-                'id',
+                'id' => 'id',
             ),
         );
     }
